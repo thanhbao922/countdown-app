@@ -13,15 +13,9 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background: linear-gradient(270deg, #ff9a9e, #fad0c4, #fad0c4, #ff9a9e);
-            background-size: 800% 800%;
-            animation: gradientBG 10s ease infinite;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            background-size: cover;
+            background-position: center;
+            transition: background-image 1s ease-in-out;
         }
 
         .container {
@@ -87,6 +81,21 @@
 
         // Gọi hàm lần đầu tiên khi trang tải
         updateCountdown();
+
+        // Background slideshow
+        const backgrounds = ['image1.jpg', 'image2.jpg', 'image3.jpg']; // Tên file ảnh
+        let currentIndex = 0;
+
+        function changeBackground() {
+            document.body.style.backgroundImage = `url('${backgrounds[currentIndex]}')`;
+            currentIndex = (currentIndex + 1) % backgrounds.length;
+        }
+
+        // Thay đổi background mỗi 5 giây
+        setInterval(changeBackground, 5000);
+
+        // Hiển thị background đầu tiên khi tải trang
+        changeBackground();
     </script>
 </body>
 </html>
