@@ -13,28 +13,33 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            background: url('image_gau') no-repeat center center;
             background-size: cover;
-            background-position: center;
-            transition: background-image 1s ease-in-out;
+            position: relative;
         }
 
         .container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            max-width: 400px;
             text-align: center;
-            background: rgba(255, 255, 255, 0.85);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0);
         }
 
         .countdown {
-            font-size: 2.5em;
-            color: #ff6347;
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            text-align: center;
         }
 
         .footer {
@@ -52,18 +57,16 @@
 </head>
 <body>
     <div class="container">
-        <h1>Từ "Vật lộn" girl thành "Chill girl" sau:</h1>
         <div class="countdown" id="countdown"></div>
         <img src="hourglass.gif" alt="Đồng hồ cát" class="hourglass">
-        <div class="footer">Hãy tận hưởng từng khoảnh khắc cuối cùng nhé! 😊</div>
     </div>
 
     <script>
-        const lastWorkingDay = new Date(2025, 1, 28, 17, 20, 0); // 28/02/2025, 5:20 PM
+        const lastWorkingDay = new Date(2025, 1, 28, 17, 20, 0);
 
         function isWeekend(date) {
             const day = date.getDay();
-            return day === 6 || day === 0; // Thứ 7 (6) và Chủ nhật (0)
+            return day === 6 || day === 0;
         }
 
         function getWorkingDaysLeft() {
@@ -77,7 +80,7 @@
                 }
                 currentDate.setDate(currentDate.getDate() + 1);
             }
-            return workingDays - 1; // Trừ đi ngày hiện tại để đúng số ngày còn lại
+            return workingDays - 1;
         }
 
         function updateCountdown() {
@@ -98,17 +101,6 @@
 
         setInterval(updateCountdown, 1000);
         updateCountdown();
-
-        const backgrounds = ['image1.jpg', 'image2.jpg', 'image3.jpg'];
-        let currentIndex = 0;
-
-        function changeBackground() {
-            document.body.style.backgroundImage = `url('${backgrounds[currentIndex]}')`;
-            currentIndex = (currentIndex + 1) % backgrounds.length;
-        }
-
-        setInterval(changeBackground, 5000);
-        changeBackground();
     </script>
 </body>
 </html>
