@@ -52,38 +52,47 @@
     </div>
 
     <script>
-        // Chọn ngày và giờ cuối cùng làm việc (Năm, Tháng (0-11), Ngày, Giờ, Phút, Giây)
         const lastWorkingDay = new Date(2025, 1, 28, 17, 20, 0); // 28/02/2025, 5:20 PM
+
+        function isWeekend(date) {
+            const day = date.getDay();
+            return day === 6 || day === 0; // Thứ 7 (6) và Chủ nhật (0)
+        }
+
+        function getWorkingDaysLeft() {
+            const now = new Date();
+            let workingDays = 0;
+            let currentDate = new Date(now);
+
+            while (currentDate < lastWorkingDay) {
+                if (!isWeekend(currentDate)) {
+                    workingDays++;
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            return workingDays - 1; // Trừ đi ngày hiện tại để đúng số ngày còn lại
+        }
 
         function updateCountdown() {
             const now = new Date();
+            if (isWeekend(now)) {
+                document.getElementById("countdown").textContent = "Tạm dừng - Hôm nay là cuối tuần!";
+                return;
+            }
+            
+            const workingDaysLeft = getWorkingDaysLeft();
             const timeLeft = lastWorkingDay - now;
-
-            // Tính số ngày, giờ, phút, giây còn lại
-            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
             const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-            // Hiển thị kết quả
-            const countdownElement = document.getElementById("countdown");
-            if (timeLeft > 0) {
-                countdownElement.textContent = `${days} ngày ${hours}h${minutes}p${seconds}s`;
-            } else if (timeLeft <= 0 && timeLeft > -1000) {
-                countdownElement.textContent = "Hôm nay là ngày cuối cùng!";
-            } else {
-                countdownElement.textContent = "Bạn đã hoàn thành công việc rồi! 🎉";
-            }
+            
+            document.getElementById("countdown").textContent = `${workingDaysLeft} ngày ${hours}h${minutes}p${seconds}s`;
         }
 
-        // Cập nhật mỗi giây
         setInterval(updateCountdown, 1000);
-
-        // Gọi hàm lần đầu tiên khi trang tải
         updateCountdown();
 
-        // Background slideshow
-        const backgrounds = ['image1.jpg', 'image2.jpg', 'image3.jpg']; // Tên file ảnh
+        const backgrounds = ['image1.jpg', 'image2.jpg', 'image3.jpg'];
         let currentIndex = 0;
 
         function changeBackground() {
@@ -91,10 +100,7 @@
             currentIndex = (currentIndex + 1) % backgrounds.length;
         }
 
-        // Thay đổi background mỗi 5 giây
         setInterval(changeBackground, 5000);
-
-        // Hiển thị background đầu tiên khi tải trang
         changeBackground();
     </script>
 </body>
