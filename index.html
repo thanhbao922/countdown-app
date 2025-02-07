@@ -59,14 +59,13 @@
     </div>
 
     <script>
-        const lastWorkingDay = new Date(2025, 1, 28, 17, 20, 0); // 28/02/2025, 5:20 PM
+        const lastWorkingDay = new Date(2025, 1, 28, 17, 20, 0);
         const workStartHour = 8;  // 8h sáng
-        const workEndHour = 17;  // 5h chiều
-        const workEndMinute = 20; // 5:20 chiều
+        const workEndHour = 17;
+        const workEndMinute = 20;
 
         function isWeekend(date) {
-            const day = date.getDay();
-            return day === 6 || day === 0; // Thứ 7 (6) và Chủ nhật (0)
+            return date.getDay() === 6 || date.getDay() === 0;
         }
 
         function isWorkingHours(date) {
@@ -76,17 +75,34 @@
         }
 
         function getWorkingHoursLeft() {
-            const now = new Date();
-            let workingHours = 0;
-            let currentDate = new Date(now);
-            
-            while (currentDate < lastWorkingDay) {
-                if (!isWeekend(currentDate) && isWorkingHours(currentDate)) {
-                    workingHours++;
+            let now = new Date();
+            let totalMinutes = 0;
+            let currentTime = new Date(now);
+
+            while (currentTime < lastWorkingDay) {
+                if (!isWeekend(currentTime)) {
+                    if (currentTime.toDateString() === now.toDateString()) {
+                        let endOfDay = new Date(currentTime);
+                        endOfDay.setHours(workEndHour, workEndMinute, 0, 0);
+                        if (currentTime < endOfDay) {
+                            totalMinutes += Math.max(0, Math.floor((endOfDay - currentTime) / (1000 * 60)));
+                        }
+                    } else if (currentTime.toDateString() === lastWorkingDay.toDateString()) {
+                        let startOfDay = new Date(currentTime);
+                        startOfDay.setHours(workStartHour, 0, 0, 0);
+                        totalMinutes += Math.max(0, Math.floor((lastWorkingDay - startOfDay) / (1000 * 60)));
+                    } else {
+                        totalMinutes += (workEndHour - workStartHour) * 60 + workEndMinute;
+                    }
                 }
-                currentDate.setHours(currentDate.getHours() + 1);
+                currentTime.setDate(currentTime.getDate() + 1);
+                currentTime.setHours(workStartHour, 0, 0, 0);
             }
-            return workingHours;
+
+            return {
+                hours: Math.floor(totalMinutes / 60),
+                minutes: Math.floor(totalMinutes % 60)
+            };
         }
 
         function updateCountdown() {
@@ -96,12 +112,10 @@
                 return;
             }
             
-            const workingHoursLeft = getWorkingHoursLeft();
-            const timeLeft = lastWorkingDay - now;
-            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+            const { hours, minutes } = getWorkingHoursLeft();
+            const seconds = 59 - now.getSeconds();
             
-            document.getElementById("countdown").textContent = `${workingHoursLeft} giờ ${minutes}p${seconds}s`;
+            document.getElementById("countdown").textContent = `${hours} giờ ${minutes}p${seconds}s`;
         }
 
         setInterval(updateCountdown, 1000);
