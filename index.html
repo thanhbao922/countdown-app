@@ -42,27 +42,36 @@
             font-size: 0.9em;
             color: #555;
         }
-    .hourglass {
+
+        .hourglass {
             width: 100px;
             height: auto;
             display: block;
+            margin: 20px auto;
+        }
+
+        .chill-gif {
+            width: 200px;
+            height: auto;
+            display: none;
             margin: 20px auto;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Từ "Vật lộn" girl thành "Chill girl" sau:</h1>
+        <h1 id="status-text">Từ "Vật lộn" girl thành "Chill girl" sau:</h1>
         <div class="countdown" id="countdown"></div>
-        <img src="hourglass.gif" alt="Đồng hồ cát" class="hourglass">
+        <img src="hourglass.gif" alt="Đồng hồ cát" class="hourglass" id="hourglass">
+        <img src="chill_girl_effects.gif" alt="Chill time" class="chill-gif" id="chillGif">
         <div class="footer">Hãy tận hưởng từng khoảnh khắc cuối cùng nhé! 😊</div>
     </div>
 
     <script>
         const lastWorkingDay = new Date(2025, 1, 28, 17, 20, 0);
-        const workStartHour = 8;  // 8h sáng
-        const workEndHour = 17;
-        const workEndMinute = 20;
+        const workStartHour = 8; // Giờ bắt đầu làm việc (TEST MODE)
+        const workEndHour = 14; // Giờ kết thúc làm việc (TEST MODE)
+        const workEndMinute = 0; // Phút kết thúc làm việc (TEST MODE)
 
         function isWeekend(date) {
             return date.getDay() === 6 || date.getDay() === 0;
@@ -107,15 +116,27 @@
 
         function updateCountdown() {
             const now = new Date();
+            const countdownElement = document.getElementById("countdown");
+            const hourglass = document.getElementById("hourglass");
+            const chillGif = document.getElementById("chillGif");
+            const statusText = document.getElementById("status-text");
+
             if (isWeekend(now) || !isWorkingHours(now)) {
-                document.getElementById("countdown").textContent = "Về nhà nghỉ ngơi thoi, countdown gì nữaaa cho mệt đầu :)))";
+                statusText.textContent = "Về nhà nghỉ ngơi thoi, countdown gì nữaaa cho mệt đầu :)))";
+                countdownElement.style.display = "none";
+                hourglass.style.display = "none";
+                chillGif.style.display = "block";
                 return;
             }
             
             const { hours, minutes } = getWorkingHoursLeft();
             const seconds = 59 - now.getSeconds();
             
-            document.getElementById("countdown").textContent = `${hours} giờ ${minutes}p${seconds}s`;
+            countdownElement.style.display = "block";
+            hourglass.style.display = "block";
+            chillGif.style.display = "none";
+            statusText.textContent = "Từ \"Vật lộn\" girl thành \"Chill girl\" sau:";
+            countdownElement.textContent = `${hours} giờ ${minutes}p${seconds}s`;
         }
 
         setInterval(updateCountdown, 1000);
