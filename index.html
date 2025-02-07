@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Countdown Ngày Làm Việc</title>
+    <title>Countdown Giờ Làm Việc</title>
     <link rel="icon" href="95c.png" type="image/png">
     <style>
         body {
@@ -60,40 +60,48 @@
 
     <script>
         const lastWorkingDay = new Date(2025, 1, 28, 17, 20, 0); // 28/02/2025, 5:20 PM
+        const workStartHour = 8;  // 8h sáng
+        const workEndHour = 17;  // 5h chiều
+        const workEndMinute = 20; // 5:20 chiều
 
         function isWeekend(date) {
             const day = date.getDay();
             return day === 6 || day === 0; // Thứ 7 (6) và Chủ nhật (0)
         }
 
-        function getWorkingDaysLeft() {
-            const now = new Date();
-            let workingDays = 0;
-            let currentDate = new Date(now);
+        function isWorkingHours(date) {
+            const hour = date.getHours();
+            const minute = date.getMinutes();
+            return hour >= workStartHour && (hour < workEndHour || (hour === workEndHour && minute <= workEndMinute));
+        }
 
+        function getWorkingHoursLeft() {
+            const now = new Date();
+            let workingHours = 0;
+            let currentDate = new Date(now);
+            
             while (currentDate < lastWorkingDay) {
-                if (!isWeekend(currentDate)) {
-                    workingDays++;
+                if (!isWeekend(currentDate) && isWorkingHours(currentDate)) {
+                    workingHours++;
                 }
-                currentDate.setDate(currentDate.getDate() + 1);
+                currentDate.setHours(currentDate.getHours() + 1);
             }
-            return workingDays - 1; // Trừ đi ngày hiện tại để đúng số ngày còn lại
+            return workingHours;
         }
 
         function updateCountdown() {
             const now = new Date();
-            if (isWeekend(now)) {
-                document.getElementById("countdown").textContent = "Cuối tuần òi, chill hoi khỏi đếm";
+            if (isWeekend(now) || !isWorkingHours(now)) {
+                document.getElementById("countdown").textContent = "Về nhà nghỉ ngơi thoi, countdown gì nữaaa cho mệt đầu :)))";
                 return;
             }
             
-            const workingDaysLeft = getWorkingDaysLeft();
+            const workingHoursLeft = getWorkingHoursLeft();
             const timeLeft = lastWorkingDay - now;
-            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
             
-            document.getElementById("countdown").textContent = `${workingDaysLeft} ngày ${hours}h${minutes}p${seconds}s`;
+            document.getElementById("countdown").textContent = `${workingHoursLeft} giờ ${minutes}p${seconds}s`;
         }
 
         setInterval(updateCountdown, 1000);
