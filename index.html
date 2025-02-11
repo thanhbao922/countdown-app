@@ -114,26 +114,25 @@
             return hour >= workStartHour && (hour < workEndHour || (hour === workEndHour && minute <= workEndMinute));
         }
 
-        function createCalendar() {
-            const calendar = document.getElementById("calendar");
-            let currentDate = new Date();
+        function getRemainingWorkHours() {
+            let now = new Date();
+            let totalMinutes = 0;
+            let currentTime = new Date(now);
             
-            while (currentDate <= lastWorkingDay) {
-                let dayElement = document.createElement("div");
-                dayElement.classList.add("day");
-                dayElement.textContent = currentDate.getDate();
-
-                if (currentDate.toDateString() === today.toDateString()) {
-                    dayElement.classList.add("current-day");
-                    let character = document.createElement("div");
-                    character.classList.add("moving-character");
-                    character.textContent = "🚶‍♂️";
-                    dayElement.appendChild(character);
+            while (currentTime < lastWorkingDay) {
+                if (!isWeekend(currentTime)) {
+                    if (currentTime.getHours() >= workStartHour && currentTime.getHours() < workEndHour) {
+                        totalMinutes += (workEndHour - currentTime.getHours()) * 60 - currentTime.getMinutes();
+                    }
                 }
-
-                calendar.appendChild(dayElement);
-                currentDate.setDate(currentDate.getDate() + 1);
+                currentTime.setDate(currentTime.getDate() + 1);
+                currentTime.setHours(workStartHour, 0, 0, 0);
             }
+
+            return {
+                hours: Math.floor(totalMinutes / 60),
+                minutes: totalMinutes % 60
+            };
         }
 
         function updateCountdown() {
@@ -151,20 +150,29 @@
                 return;
             }
             
-            const hoursLeft = Math.floor((lastWorkingDay - now) / (1000 * 60 * 60));
-            const minutesLeft = Math.floor(((lastWorkingDay - now) % (1000 * 60 * 60)) / (1000 * 60));
-            const secondsLeft = Math.floor(((lastWorkingDay - now) % (1000 * 60)) / 1000);
+            const { hours, minutes } = getRemainingWorkHours();
+            const seconds = 59 - now.getSeconds();
             
             countdownElement.style.display = "block";
             hourglass.style.display = "block";
             chillGif.style.display = "none";
             statusText.textContent = "Lịch Countdown Giải Thoát 🎉";
-            countdownElement.textContent = `${hoursLeft} giờ ${minutesLeft}p ${secondsLeft}s`;
+            countdownElement.textContent = `${hours} giờ ${minutes}p ${seconds}s`;
+        }
+
+        function changeBackground() {
+            const backgrounds = ['image1.jpg', 'image2.jpg', 'image3.jpg'];
+            let currentIndex = 0;
+            setInterval(() => {
+                document.body.style.backgroundImage = `url('${backgrounds[currentIndex]}')`;
+                currentIndex = (currentIndex + 1) % backgrounds.length;
+            }, 5000);
         }
 
         createCalendar();
         setInterval(updateCountdown, 1000);
         updateCountdown();
+        changeBackground();
     </script>
 </body>
 </html>
