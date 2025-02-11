@@ -9,8 +9,9 @@
         body {
             font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             margin: 0;
             background-size: cover;
@@ -18,140 +19,73 @@
             transition: background-image 1s ease-in-out;
         }
 
-        .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.85);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .countdown {
-            font-size: 2.5em;
-            color: #ff6347;
-        }
-
-        .footer {
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            max-width: 500px;
             margin-top: 20px;
-            font-size: 0.9em;
-            color: #555;
+            text-align: center;
         }
 
-        .hourglass {
-            width: 100px;
-            height: auto;
-            display: block;
-            margin: 20px auto;
+        .day {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            position: relative;
+            background: #f9f9f9;
         }
 
-        .chill-gif {
-            width: 200px;
-            height: auto;
-            display: none;
-            margin: 20px auto;
+        .current-day {
+            background: #ff6347;
+            color: white;
+            font-weight: bold;
+        }
+
+        .moving-character {
+            position: absolute;
+            bottom: -10px;
+            font-size: 18px;
+            transition: transform 1s ease-in-out;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 id="status-text">Từ "Vật lộn" girl thành "Chill girl" sau:</h1>
-        <div class="countdown" id="countdown"></div>
-        <img src="hourglass.gif" alt="Đồng hồ cát" class="hourglass" id="hourglass">
-        <img src="chill_girl_effects.gif" alt="Chill time" class="chill-gif" id="chillGif">
-        <div class="footer">Hãy tận hưởng từng khoảnh khắc cuối cùng nhé! 😊</div>
-    </div>
+    <h1>Lịch Countdown Giải Thoát 🎉</h1>
+    <div class="calendar" id="calendar"></div>
 
     <script>
-        const lastWorkingDay = new Date(2025, 1, 28, 17, 20, 0);
-        const workStartHour = 8; // Giờ bắt đầu làm việc (Chuẩn)
-        const workEndHour = 17; // Giờ kết thúc làm việc (Chuẩn)
-        const workEndMinute = 20; // Phút kết thúc làm việc (Chuẩn)
+        const startDate = new Date();
+        const lastWorkingDay = new Date(2025, 1, 28);
+        const today = new Date();
 
-        function isWeekend(date) {
-            return date.getDay() === 6 || date.getDay() === 0;
-        }
+        function createCalendar() {
+            const calendar = document.getElementById("calendar");
+            let currentDate = new Date(startDate);
+            
+            while (currentDate <= lastWorkingDay) {
+                let dayElement = document.createElement("div");
+                dayElement.classList.add("day");
+                dayElement.textContent = currentDate.getDate();
 
-        function isWorkingHours(date) {
-            const hour = date.getHours();
-            const minute = date.getMinutes();
-            return hour >= workStartHour && (hour < workEndHour || (hour === workEndHour && minute <= workEndMinute));
-        }
-
-        function getWorkingHoursLeft() {
-            let now = new Date();
-            let totalMinutes = 0;
-            let currentTime = new Date(now);
-
-            while (currentTime < lastWorkingDay) {
-                if (!isWeekend(currentTime)) {
-                    if (currentTime.toDateString() === now.toDateString()) {
-                        let endOfDay = new Date(currentTime);
-                        endOfDay.setHours(workEndHour, workEndMinute, 0, 0);
-                        if (currentTime < endOfDay) {
-                            totalMinutes += Math.max(0, Math.floor((endOfDay - currentTime) / (1000 * 60)));
-                        }
-                    } else if (currentTime.toDateString() === lastWorkingDay.toDateString()) {
-                        let startOfDay = new Date(currentTime);
-                        startOfDay.setHours(workStartHour, 0, 0, 0);
-                        totalMinutes += Math.max(0, Math.floor((lastWorkingDay - startOfDay) / (1000 * 60)));
-                    } else {
-                        totalMinutes += (workEndHour - workStartHour) * 60 + workEndMinute;
-                    }
+                if (currentDate.toDateString() === today.toDateString()) {
+                    dayElement.classList.add("current-day");
+                    let character = document.createElement("div");
+                    character.classList.add("moving-character");
+                    character.textContent = "🚶‍♂️";
+                    dayElement.appendChild(character);
                 }
-                currentTime.setDate(currentTime.getDate() + 1);
-                currentTime.setHours(workStartHour, 0, 0, 0);
+
+                calendar.appendChild(dayElement);
+                currentDate.setDate(currentDate.getDate() + 1);
             }
-
-            return {
-                hours: Math.floor(totalMinutes / 60),
-                minutes: Math.floor(totalMinutes % 60)
-            };
         }
 
-        function updateCountdown() {
-            const now = new Date();
-            const countdownElement = document.getElementById("countdown");
-            const hourglass = document.getElementById("hourglass");
-            const chillGif = document.getElementById("chillGif");
-            const statusText = document.getElementById("status-text");
-
-            if (isWeekend(now) || !isWorkingHours(now)) {
-                statusText.textContent = "Về nhà nghỉ ngơi thoi, countdown gì nữaaa cho mệt đầu :)))";
-                countdownElement.style.display = "none";
-                hourglass.style.display = "none";
-                chillGif.style.display = "block";
-                return;
-            }
-            
-            const { hours, minutes } = getWorkingHoursLeft();
-            const seconds = 59 - now.getSeconds();
-            
-            countdownElement.style.display = "block";
-            hourglass.style.display = "block";
-            chillGif.style.display = "none";
-            statusText.textContent = "Từ \"Vật lộn\" girl thành \"Chill girl\" sau:";
-            countdownElement.textContent = `${hours} giờ ${minutes}p${seconds}s`;
-        }
-
-        setInterval(updateCountdown, 1000);
-        updateCountdown();
-
-        const backgrounds = ['image1.jpg', 'image2.jpg', 'image3.jpg'];
-        let currentIndex = 0;
-
-        function changeBackground() {
-            document.body.style.backgroundImage = `url('${backgrounds[currentIndex]}')`;
-            currentIndex = (currentIndex + 1) % backgrounds.length;
-        }
-
-        setInterval(changeBackground, 5000);
-        changeBackground();
+        createCalendar();
     </script>
 </body>
 </html>
