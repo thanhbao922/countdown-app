@@ -19,6 +19,26 @@
             transition: background-image 1s ease-in-out;
         }
 
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .countdown {
+            font-size: 2.5em;
+            color: #ff6347;
+            margin-bottom: 20px;
+        }
+
         .calendar {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -52,20 +72,51 @@
             font-size: 18px;
             transition: transform 1s ease-in-out;
         }
+
+        .hourglass {
+            width: 100px;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .chill-gif {
+            width: 200px;
+            height: auto;
+            display: none;
+            margin: 20px auto;
+        }
     </style>
 </head>
 <body>
-    <h1>Lịch Countdown Giải Thoát 🎉</h1>
-    <div class="calendar" id="calendar"></div>
+    <div class="container">
+        <h1 id="status-text">Lịch Countdown Giải Thoát 🎉</h1>
+        <div class="countdown" id="countdown"></div>
+        <img src="hourglass.gif" alt="Đồng hồ cát" class="hourglass" id="hourglass">
+        <img src="chill_girl_effects.gif" alt="Chill time" class="chill-gif" id="chillGif">
+        <div class="calendar" id="calendar"></div>
+    </div>
 
     <script>
-        const startDate = new Date();
-        const lastWorkingDay = new Date(2025, 1, 28);
+        const lastWorkingDay = new Date(2025, 1, 28, 17, 20, 0);
+        const workStartHour = 8;
+        const workEndHour = 17;
+        const workEndMinute = 20;
         const today = new Date();
+
+        function isWeekend(date) {
+            return date.getDay() === 6 || date.getDay() === 0;
+        }
+
+        function isWorkingHours(date) {
+            const hour = date.getHours();
+            const minute = date.getMinutes();
+            return hour >= workStartHour && (hour < workEndHour || (hour === workEndHour && minute <= workEndMinute));
+        }
 
         function createCalendar() {
             const calendar = document.getElementById("calendar");
-            let currentDate = new Date(startDate);
+            let currentDate = new Date();
             
             while (currentDate <= lastWorkingDay) {
                 let dayElement = document.createElement("div");
@@ -85,7 +136,35 @@
             }
         }
 
+        function updateCountdown() {
+            const now = new Date();
+            const countdownElement = document.getElementById("countdown");
+            const hourglass = document.getElementById("hourglass");
+            const chillGif = document.getElementById("chillGif");
+            const statusText = document.getElementById("status-text");
+
+            if (isWeekend(now) || !isWorkingHours(now)) {
+                statusText.textContent = "Về nhà nghỉ ngơi thoi, countdown gì nữaaa cho mệt đầu :)))";
+                countdownElement.style.display = "none";
+                hourglass.style.display = "none";
+                chillGif.style.display = "block";
+                return;
+            }
+            
+            const hoursLeft = Math.floor((lastWorkingDay - now) / (1000 * 60 * 60));
+            const minutesLeft = Math.floor(((lastWorkingDay - now) % (1000 * 60 * 60)) / (1000 * 60));
+            const secondsLeft = Math.floor(((lastWorkingDay - now) % (1000 * 60)) / 1000);
+            
+            countdownElement.style.display = "block";
+            hourglass.style.display = "block";
+            chillGif.style.display = "none";
+            statusText.textContent = "Lịch Countdown Giải Thoát 🎉";
+            countdownElement.textContent = `${hoursLeft} giờ ${minutesLeft}p ${secondsLeft}s`;
+        }
+
         createCalendar();
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
     </script>
 </body>
 </html>
