@@ -114,25 +114,27 @@
             return hour >= workStartHour && (hour < workEndHour || (hour === workEndHour && minute <= workEndMinute));
         }
 
-        function getRemainingWorkHours() {
-            let now = new Date();
-            let totalMinutes = 0;
-            let currentTime = new Date(now);
+        function createCalendar() {
+            const calendar = document.getElementById("calendar");
+            calendar.innerHTML = ""; // Reset nội dung trước khi thêm mới
+            let currentDate = new Date();
             
-            while (currentTime < lastWorkingDay) {
-                if (!isWeekend(currentTime)) {
-                    if (currentTime.getHours() >= workStartHour && currentTime.getHours() < workEndHour) {
-                        totalMinutes += (workEndHour - currentTime.getHours()) * 60 - currentTime.getMinutes();
-                    }
-                }
-                currentTime.setDate(currentTime.getDate() + 1);
-                currentTime.setHours(workStartHour, 0, 0, 0);
-            }
+            while (currentDate <= lastWorkingDay) {
+                let dayElement = document.createElement("div");
+                dayElement.classList.add("day");
+                dayElement.textContent = currentDate.getDate();
 
-            return {
-                hours: Math.floor(totalMinutes / 60),
-                minutes: totalMinutes % 60
-            };
+                if (currentDate.toDateString() === today.toDateString()) {
+                    dayElement.classList.add("current-day");
+                    let character = document.createElement("div");
+                    character.classList.add("moving-character");
+                    character.textContent = "🚶‍♂️";
+                    dayElement.appendChild(character);
+                }
+
+                calendar.appendChild(dayElement);
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
         }
 
         function updateCountdown() {
@@ -150,8 +152,10 @@
                 return;
             }
             
-            const { hours, minutes } = getRemainingWorkHours();
-            const seconds = 59 - now.getSeconds();
+            const remainingTime = lastWorkingDay - now;
+            const hours = Math.floor(remainingTime / (1000 * 60 * 60));
+            const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
             
             countdownElement.style.display = "block";
             hourglass.style.display = "block";
