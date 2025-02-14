@@ -102,39 +102,51 @@
         const workStartHour = 8;
         const workEndHour = 17;
         const workEndMinute = 20;
-        const today = new Date();
 
         function isWeekend(date) {
             return date.getDay() === 6 || date.getDay() === 0;
         }
 
-        function isWorkingHours(date) {
-            const hour = date.getHours();
-            const minute = date.getMinutes();
-            return hour >= workStartHour && (hour < workEndHour || (hour === workEndHour && minute <= workEndMinute));
-        }
-
         function createCalendar() {
             const calendar = document.getElementById("calendar");
-            calendar.innerHTML = ""; // Reset nội dung trước khi thêm mới
+            calendar.innerHTML = "";
             let currentDate = new Date();
-            
             while (currentDate <= lastWorkingDay) {
-                let dayElement = document.createElement("div");
-                dayElement.classList.add("day");
-                dayElement.textContent = currentDate.getDate();
-
-                if (currentDate.toDateString() === today.toDateString()) {
-                    dayElement.classList.add("current-day");
-                    let character = document.createElement("div");
-                    character.classList.add("moving-character");
-                    character.textContent = "🚶‍♂️";
-                    dayElement.appendChild(character);
+                if (!isWeekend(currentDate)) {
+                    let dayElement = document.createElement("div");
+                    dayElement.classList.add("day");
+                    dayElement.textContent = currentDate.getDate();
+                    if (currentDate.toDateString() === new Date().toDateString()) {
+                        dayElement.classList.add("current-day");
+                        let character = document.createElement("div");
+                        character.classList.add("moving-character");
+                        character.textContent = "🚶‍♂️";
+                        dayElement.appendChild(character);
+                    }
+                    calendar.appendChild(dayElement);
                 }
-
-                calendar.appendChild(dayElement);
                 currentDate.setDate(currentDate.getDate() + 1);
             }
+        }
+
+        function calculateRemainingWorkHours() {
+            let now = new Date();
+            let totalMinutes = 0;
+            let current = new Date(now);
+            while (current < lastWorkingDay) {
+                if (!isWeekend(current)) {
+                    let workEndToday = new Date(current);
+                    workEndToday.setHours(workEndHour, workEndMinute, 0, 0);
+                    let remainingToday = Math.max(0, (workEndToday - current) / 60000);
+                    totalMinutes += remainingToday;
+                }
+                current.setDate(current.getDate() + 1);
+                current.setHours(workStartHour, 0, 0, 0);
+            }
+            return {
+                hours: Math.floor(totalMinutes / 60),
+                minutes: Math.floor(totalMinutes % 60)
+            };
         }
 
         function updateCountdown() {
@@ -143,20 +155,15 @@
             const hourglass = document.getElementById("hourglass");
             const chillGif = document.getElementById("chillGif");
             const statusText = document.getElementById("status-text");
-
-            if (isWeekend(now) || !isWorkingHours(now)) {
+            if (isWeekend(now) || now.getHours() < workStartHour || now.getHours() >= workEndHour) {
                 statusText.textContent = "Về nhà nghỉ ngơi thoi, countdown gì nữaaa cho mệt đầu :)))";
                 countdownElement.style.display = "none";
                 hourglass.style.display = "none";
                 chillGif.style.display = "block";
                 return;
             }
-            
-            const remainingTime = lastWorkingDay - now;
-            const hours = Math.floor(remainingTime / (1000 * 60 * 60));
-            const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
-            
+            const { hours, minutes } = calculateRemainingWorkHours();
+            const seconds = 59 - now.getSeconds();
             countdownElement.style.display = "block";
             hourglass.style.display = "block";
             chillGif.style.display = "none";
