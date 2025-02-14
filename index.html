@@ -26,6 +26,7 @@
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(10px);
+            width: fit-content;
         }
 
         h1 {
@@ -40,16 +41,13 @@
         }
 
         .calendar {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 5px;
-            max-width: 500px;
-            margin-top: 20px;
+            max-width: 350px; /* Điều chỉnh kích thước để phù hợp */
+            margin: 20px auto; /* Căn giữa */
             text-align: center;
+            justify-content: center; /* Căn giữa nội dung */
         }
 
         .day {
@@ -159,6 +157,7 @@
             const hourglass = document.getElementById("hourglass");
             const chillGif = document.getElementById("chillGif");
             const statusText = document.getElementById("status-text");
+
             if (isWeekend(now) || now.getHours() < workStartHour || now.getHours() >= workEndHour) {
                 statusText.textContent = "Về nhà thì lo hun ảnh Bải đi, lên đếm làm rì :)))";
                 countdownElement.style.display = "none";
@@ -166,6 +165,7 @@
                 chillGif.style.display = "block";
                 return;
             }
+
             const { hours, minutes } = calculateRemainingWorkHours();
             const seconds = 59 - now.getSeconds();
             countdownElement.style.display = "block";
