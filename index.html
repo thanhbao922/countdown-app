@@ -94,7 +94,7 @@
 </head>
 <body>
     <div class="container">
-        <h1 id="status-text">Lịch Countdown Giải Thoát 🎉</h1>
+        <h1 id="status-text">Một cô gái xinh đẹp đang ngồi nhẩm đếm số ngày mình được giải thoát 🎉</h1>
         <div class="countdown" id="countdown"></div>
         <img src="hourglass.gif" alt="Đồng hồ cát" class="hourglass" id="hourglass">
         <img src="chill_girl_effects.gif" alt="Chill time" class="chill-gif" id="chillGif">
@@ -102,7 +102,7 @@
     </div>
 
     <script>
-        const lastWorkingDay = new Date(2025, 1, 28, 17, 20, 0);
+        const lastWorkingDay = new Date(2025, 2, 4, 17, 20, 0);
         const workStartHour = 8;
         const workEndHour = 17;
         const workEndMinute = 20;
@@ -160,7 +160,7 @@
             const chillGif = document.getElementById("chillGif");
             const statusText = document.getElementById("status-text");
             if (isWeekend(now) || now.getHours() < workStartHour || now.getHours() >= workEndHour) {
-                statusText.textContent = "Về nhà nghỉ ngơi thoi, countdown gì nữaaa cho mệt đầu :)))";
+                statusText.textContent = "Về nhà thì lo hun ảnh Bải đi, lên đếm làm rì :)))";
                 countdownElement.style.display = "none";
                 hourglass.style.display = "none";
                 chillGif.style.display = "block";
@@ -171,7 +171,7 @@
             countdownElement.style.display = "block";
             hourglass.style.display = "block";
             chillGif.style.display = "none";
-            statusText.textContent = "Lịch Countdown Giải Thoát 🎉";
+            statusText.textContent = "Một cô gái xinh đẹp đang ngồi nhẩm đếm số ngày mình được giải thoát 🎉";
             countdownElement.textContent = `${hours} giờ ${minutes}p ${seconds}s`;
         }
 
